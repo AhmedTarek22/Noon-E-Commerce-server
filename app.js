@@ -1,9 +1,6 @@
 import express from "express";
 import { dbConnection } from "./db/dbConnection.js";
 import userRoutes from "./src/modules/users/user.routes.js";
-import sendEmail from "./src/email/email.js";
-import AppError from "./src/utility/appError.js";
-import fs from "fs";
 import cors from "cors";
 import productRoutes from "./src/modules/products/product.routes.js";
 import cartRoutes from "./src/modules/cart/cart.router.js";
@@ -31,8 +28,7 @@ app.use(
       }
     },
     credentials: true,
-  })
-);
+}));
 
 app.use(express.json());
 // db connection
@@ -50,17 +46,25 @@ app.use(categoryRouters);
 app.use(subCategoryRouters);
 app.use(favoriteRoutes);
 
-app.use((err, req, res, next) => {
-  res.status(err.statusCode).json({ message: err.message });
-});
+// app.use((err, req, res, next) => {
+//   res.status(err.statusCode).json({ message: err.message });
+// });
 
-// handle invalid url
-app.use("*", (req, res, next) => {
-  next(new AppError("invalid URL", 404));
+app.use((err, req, res, next) => {
+  console.error(err.stack); // عرض الخطأ في السجل
+  res.status(err.statusCode || 500).json({
+    message: err.message || "Internal Server Error",
+  });
 });
 
 app.get("/test", (req, res) => {
   res.status(200).json({ message: "Server is working!" });
+});
+
+// handle invalid url
+app.use("*", (req, res) => {
+  console.log(`Invalid URL requested: ${req.originalUrl}`);
+  res.status(404).json({ message: "Invalid URL" });
 });
 
 app.listen(port, () => console.log(`server running on port: ${port}`));
