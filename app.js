@@ -15,6 +15,25 @@ import couponRoutes from "./src/modules/coupon/coupon.routes.js";
 
 const app = express();
 const port = 4000;
+
+const allowedOrigins = [
+  "http://localhost:4200",
+  "https://noon-e-commerce-website.vercel.app",
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 // db connection
 dbConnection;
@@ -29,12 +48,10 @@ app.use(cartRoutes);
 
 app.use(couponRoutes);
 
-
 app.use(categoryRouters);
 
 app.use(subCategoryRouters);
 app.use(favoriteRoutes);
-
 
 app.use((err, req, res, next) => {
   res.status(err.statusCode).json({ message: err.message });
