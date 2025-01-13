@@ -38,9 +38,6 @@ app.use(express.json());
 // db connection
 dbConnection;
 
-//connect with front
-app.use(cors());
-
 // userRoutes
 app.use(userRoutes);
 app.use(productRoutes);
@@ -60,6 +57,10 @@ app.use((err, req, res, next) => {
 // handle invalid url
 app.use("*", (req, res, next) => {
   next(new AppError("invalid URL", 404));
+});
+
+app.get("/test", (req, res) => {
+  res.status(200).json({ message: "Server is working!" });
 });
 
 app.listen(port, () => console.log(`server running on port: ${port}`));
